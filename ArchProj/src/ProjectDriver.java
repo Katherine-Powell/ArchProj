@@ -52,17 +52,17 @@ public class ProjectDriver {
 		System.out.println("Cache Hit Rate: ***%");
 		System.out.println("CPI: ");
 		
-		while (scan.hasNextLine()) {
-		//	scan.nextLine();
-			String line = "";
-			while(!(line = scan.nextLine()).isEmpty()) {
-				line = scan.nextLine();
-
+		
+		
+		
+		while(scan.hasNextLine()) {
+			String line = scan.nextLine();
+			if((line.contains("EIP")) || (line.contains("dstM"))) {
+			//	scan.nextLine();
 				
-			
+				System.out.print(parseLineOne(line) + " ");
+				System.out.println(parseLineTwo(scan.nextLine()));
 			}
-			System.out.print(parseLineOne(line) + " ");
-			System.out.println(parseLineTwo(scan.nextLine()));
 		}
 		
 	}
