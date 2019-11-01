@@ -102,6 +102,8 @@ public class ProjectDriver {
 	//	dstMInt = Integer.parseInt(dstM);
 	//	srcMInt = Integer.parseInt(srcM);
 		
+		System.out.println(Util.toHex(dstM));
+		
 		if ((dstM.equals("00000000")) && (srcM.equals("00000000"))) {
 			return "No data writes/reads occurred.";
 		}
