@@ -52,17 +52,17 @@ public class ProjectDriver {
 		System.out.println("Cache Hit Rate: ***%");
 		System.out.println("CPI: ");
 		
-		while (scan.hasNextLine()) {
-		//	scan.nextLine();
-			String line = "";
-			while(!(line = scan.nextLine()).isEmpty()) {
-				line = scan.nextLine();
-
+		
+		
+		
+		while(scan.hasNextLine()) {
+			String line = scan.nextLine();
+			if((line.contains("EIP")) || (line.contains("dstM"))) {
+			//	scan.nextLine();
 				
-			
+				System.out.print(parseLineOne(line) + " ");
+				System.out.println(parseLineTwo(scan.nextLine()));
 			}
-			System.out.print(parseLineOne(line) + " ");
-			System.out.println(parseLineTwo(scan.nextLine()));
 		}
 		
 	}
@@ -81,7 +81,9 @@ public class ProjectDriver {
 			length += lineArray[i];
 		}
 		
-		return "Address: " + grabAddress + ", length = " + length + ".";
+		Long hexLong = Long.parseUnsignedLong(grabAddress, 16);
+		
+		return "Address: " + grabAddress + ", length = " + length + "." + " " + hexLong + " "+Long.toHexString(hexLong);
 	}
 	
 	public static String parseLineTwo (String line) {
@@ -102,7 +104,6 @@ public class ProjectDriver {
 	//	dstMInt = Integer.parseInt(dstM);
 	//	srcMInt = Integer.parseInt(srcM);
 		
-		System.out.println(Util.toHex(dstM));
 		
 		if ((dstM.equals("00000000")) && (srcM.equals("00000000"))) {
 			return "No data writes/reads occurred.";

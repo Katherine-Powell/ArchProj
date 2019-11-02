@@ -14,7 +14,4 @@ public class Util {
 	public static int convertToKB(int bytes) {
 		return bytes/1024;
 	}
-	public static String toHex(String arg) {
-	    return String.format("%040x", new BigInteger(1, arg.getBytes(StandardCharsets.US_ASCII)));
-	}
 }
