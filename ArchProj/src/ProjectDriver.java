@@ -12,7 +12,7 @@ public class ProjectDriver {
 		File inputFile = new File (traceFileName);
 		Scanner scan = new Scanner(inputFile);
 			
-		PrintStream outputFile = new PrintStream(new File("Trace1.trc"));
+		PrintStream outputFile = new PrintStream(new File("Trace3.trc"));
 				
 		// Initialize Command Line Arguments
 		Cache cache = new Cache(args);
@@ -45,24 +45,18 @@ public class ProjectDriver {
 		System.out.println("Overhead Memory Size: " + cache.getOverhead() + " bytes (or " + Util.convertToKB(cache.getOverhead()) + " KB)");
 		System.out.println("Implementation Memory Size: " + cache.getImpMemorySize() + " bytes (or " + Util.convertToKB(cache.getImpMemorySize()) + " KB)");
 		
-		//TODO: parse input file and print the first 20 addresses and address lengths
-		
-		
 		System.out.println("----- Results -----");
 		System.out.println("Cache Hit Rate: ***%");
-		System.out.println("CPI: ");
+		System.out.println("CPI: \n");		
 		
-		
-		
-		
-		while(scan.hasNextLine()) {
+		i=0;
+		while(scan.hasNextLine() && i<20) {
 			String line = scan.nextLine();
 			if((line.contains("EIP")) || (line.contains("dstM"))) {
-			//	scan.nextLine();
-				
-				System.out.print(parseLineOne(line) + " ");
+				System.out.println(parseLineOne(line) + " ");
 				System.out.println(parseLineTwo(scan.nextLine()));
 			}
+			i++;
 		}
 		
 	}
@@ -81,15 +75,18 @@ public class ProjectDriver {
 			length += lineArray[i];
 		}
 		
-		Long hexLong = Long.parseUnsignedLong(grabAddress, 16);
+		Long address = Long.parseUnsignedLong(grabAddress, 16);
 		
-		return "Address: " + grabAddress + ", length = " + length + "." + " " + hexLong + " "+Long.toHexString(hexLong);
+		return String.format("0x%08x: (%d)", address, Integer.parseInt(length));
+		
+		//return "Address: " + grabAddress + ", length = " + length + "." + " " + hexLong + " "+Long.toHexString(hexLong);
 	}
 	
 	public static String parseLineTwo (String line) {
 		char[] lineArray = line.toCharArray();
 		String dstM = new String(); 
 		String srcM = new String();
+		long dstAddress, srcAddress;
 		
 		int i, dstMInt, srcMInt;
 		
@@ -101,11 +98,12 @@ public class ProjectDriver {
 			srcM += lineArray[i];
 		}
 		
-	//	dstMInt = Integer.parseInt(dstM);
-	//	srcMInt = Integer.parseInt(srcM);
+		dstAddress = Long.parseUnsignedLong(dstM, 16);
+		srcAddress = Long.parseUnsignedLong(srcM, 16);
 		
+		return String.format("0x%08x: (4)\n0x%08x: (4)", dstAddress, srcAddress);
 		
-		if ((dstM.equals("00000000")) && (srcM.equals("00000000"))) {
+		/*if ((dstM.equals("00000000")) && (srcM.equals("00000000"))) {
 			return "No data writes/reads occurred.";
 		}
 		else if (!(dstM.equals("00000000")) && (srcM.equals("00000000"))) {
@@ -116,6 +114,6 @@ public class ProjectDriver {
 		}
 		else {
 			return "Data write at " + dstM + ", data read at " + srcM + ", length = 4 bytes.";
-		}
+		}*/
 	}
 }
