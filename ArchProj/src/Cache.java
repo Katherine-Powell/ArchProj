@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 
 public class Cache {
 	
@@ -17,6 +19,9 @@ public class Cache {
 	private int overhead;
 	private int impMemorySize;
 	
+	private ArrayList<int[]> chache;
+	private int data[];
+	
 	public Cache(String[] args) {
 		//Given
 		cacheSize = Integer.parseInt(args[4]) * 1024; //convert to bytes
@@ -32,6 +37,10 @@ public class Cache {
 		numIndicies = calcNumIndicies();
 		overhead = calcOverhead();
 		impMemorySize = calcImpMemorySize();
+		
+		chache = new ArrayList<int[]>();
+		
+		data = new int[cacheSize];
 	}
 	
 	public String getAssocName() {
@@ -114,6 +123,14 @@ public class Cache {
 
 	public int getBlockOffset() {
 		return blockOffsetBits;
+	}
+
+	public int[] getData() {
+		return data;
+	}
+
+	public void setData(int[] data) {
+		this.data = data;
 	}
 
 	public void setBlockOffset(int blockOffset) {

@@ -49,19 +49,19 @@ public class ProjectDriver {
 		System.out.println("Cache Hit Rate: ***%");
 		System.out.println("CPI: \n");		
 		
-		i=0;
-		while(scan.hasNextLine() && i<20) {
+		while(scan.hasNextLine()) {
 			String line = scan.nextLine();
 			if((line.contains("EIP")) || (line.contains("dstM"))) {
-				System.out.println(parseLineOne(line) + " ");
-				System.out.println(parseLineTwo(scan.nextLine()));
+				parseAddressOne(line);
+				line = scan.nextLine();
+				parseAddressTwo(line);
+				parseAddressThree(line);
 			}
-			i++;
 		}
 		
 	}
 	
-	public static String parseLineOne (String line) {
+	public static int parseAddressOne (String line) {
 		char[] lineArray = line.toCharArray();
 		String grabAddress = new String(); 
 		String length = new String();
@@ -75,45 +75,35 @@ public class ProjectDriver {
 			length += lineArray[i];
 		}
 		
-		Long address = Long.parseUnsignedLong(grabAddress, 16);
-		
-		return String.format("0x%08x: (%d)", address, Integer.parseInt(length));
-		
-		//return "Address: " + grabAddress + ", length = " + length + "." + " " + hexLong + " "+Long.toHexString(hexLong);
+		int address = Integer.parseInt(grabAddress, 16);
+		return address;
+		//String.format("0x%08x: (%d)", address, Integer.parseInt(length));
 	}
 	
-	public static String parseLineTwo (String line) {
+	public static int parseAddressTwo (String line) {
 		char[] lineArray = line.toCharArray();
-		String dstM = new String(); 
-		String srcM = new String();
-		long dstAddress, srcAddress;
-		
-		int i, dstMInt, srcMInt;
+		String dstM = new String();
+		int i, dstAddress;
 		
 		for (i=6; i<14; i++) {
 			dstM += lineArray[i];
-		}
+		}	
+		
+		dstAddress = Integer.parseInt(dstM, 16);
+		
+		return dstAddress;
+	}
+	
+	public static int parseAddressThree (String line) {
+		char[] lineArray = line.toCharArray();
+		String srcM = new String();
+		int i, srcAddress;
 		
 		for (i=33; i<41; i++) {
 			srcM += lineArray[i];
 		}
 		
-		dstAddress = Long.parseUnsignedLong(dstM, 16);
-		srcAddress = Long.parseUnsignedLong(srcM, 16);
-		
-		return String.format("0x%08x: (4)\n0x%08x: (4)", dstAddress, srcAddress);
-		
-		/*if ((dstM.equals("00000000")) && (srcM.equals("00000000"))) {
-			return "No data writes/reads occurred.";
-		}
-		else if (!(dstM.equals("00000000")) && (srcM.equals("00000000"))) {
-			return "Data write at " + dstM + ". No data reads occurred, length = 4 bytes.";
-		}
-		else if ((dstM.equals("00000000")) && !(srcM.equals("00000000"))) {
-			return "No data writes occurred. Data read at " + srcM + ", length = 4 bytes.";
-		}
-		else {
-			return "Data write at " + dstM + ", data read at " + srcM + ", length = 4 bytes.";
-		}*/
+		srcAddress = Integer.parseInt(srcM, 16);
+		return srcAddress;
 	}
 }
