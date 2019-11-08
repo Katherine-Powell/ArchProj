@@ -12,7 +12,7 @@ public class ProjectDriver {
 		File inputFile = new File (traceFileName);
 		Scanner scan = new Scanner(inputFile);
 			
-		PrintStream outputFile = new PrintStream(new File("Trace3.trc"));
+		PrintStream outputFile = new PrintStream(new File("Trace4.trc"));
 				
 		// Initialize Command Line Arguments
 		Cache cache = new Cache(args);
