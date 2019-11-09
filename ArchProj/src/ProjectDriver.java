@@ -49,6 +49,7 @@ public class ProjectDriver {
 		System.out.println("Cache Hit Rate: ***%");
 		System.out.println("CPI: \n");		
 		
+		//TODO: random replace, and CPI calculation
 		
 		while(scan.hasNextLine()) {
 			String line = scan.nextLine();
