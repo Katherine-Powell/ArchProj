@@ -12,7 +12,7 @@ public class ProjectDriver {
 		File inputFile = new File (traceFileName);
 		Scanner scan = new Scanner(inputFile);
 			
-		PrintStream outputFile = new PrintStream(new File("Trace4.trc"));
+		PrintStream outputFile = new PrintStream(new File("Trace5.trc"));
 				
 		// Initialize Command Line Arguments
 		Cache cache = new Cache(args);
@@ -49,23 +49,34 @@ public class ProjectDriver {
 		System.out.println("Cache Hit Rate: ***%");
 		System.out.println("CPI: \n");		
 		
+		
 		while(scan.hasNextLine()) {
 			String line = scan.nextLine();
 			if((line.contains("EIP")) || (line.contains("dstM"))) {
-				parseAddressOne(line);
+				int length = parseLength(line);
+				cache.addRoundRobinEntry(parseAddressOne(line), length);
 				line = scan.nextLine();
-				parseAddressTwo(line);
-				parseAddressThree(line);
+				cache.addRoundRobinEntry(parseAddressTwo(line) , 4);
+				cache.addRoundRobinEntry(parseAddressThree(line), 4);
 			}
 		}
 		
-		cache.setIndexBits(3);
-		int num = Integer.parseInt("C8", 16);
-		System.out.println(cache.getIndexFromAddress(num));
-		System.out.println(cache.getTagFromAddress(num));
+		
+		System.out.println(cache.getCacheHitRatio());
 	}
 	
-	public static int parseAddressOne (String line) {
+	public static int parseLength(String line) {
+		char[] lineArray = line.toCharArray();
+		String length = new String();
+		
+		for (int i=5; i<7; i++) {
+			length += lineArray[i];
+		}
+		
+		return Integer.parseInt(length);
+	}
+	
+	public static long parseAddressOne (String line) {
 		char[] lineArray = line.toCharArray();
 		String grabAddress = new String(); 
 		String length = new String();
@@ -75,39 +86,37 @@ public class ProjectDriver {
 			grabAddress += lineArray[i];
 		}
 		
-		for (i=5; i<7; i++) {
-			length += lineArray[i];
-		}
-		
-		int address = Integer.parseInt(grabAddress, 16);
+		long address = Long.parseLong(grabAddress, 16);
 		return address;
 		//String.format("0x%08x: (%d)", address, Integer.parseInt(length));
 	}
 	
-	public static int parseAddressTwo (String line) {
+	public static long parseAddressTwo (String line) {
 		char[] lineArray = line.toCharArray();
 		String dstM = new String();
-		int i, dstAddress;
+		int i;
+		long dstAddress;
 		
 		for (i=6; i<14; i++) {
 			dstM += lineArray[i];
 		}	
 		
-		dstAddress = Integer.parseInt(dstM, 16);
+		dstAddress = Long.parseLong(dstM, 16);
 		
 		return dstAddress;
 	}
 	
-	public static int parseAddressThree (String line) {
+	public static long parseAddressThree (String line) {
 		char[] lineArray = line.toCharArray();
 		String srcM = new String();
-		int i, srcAddress;
+		int i;
+		long srcAddress;
 		
 		for (i=33; i<41; i++) {
 			srcM += lineArray[i];
 		}
 		
-		srcAddress = Integer.parseInt(srcM, 16);
+		srcAddress = Long.parseLong(srcM, 16);
 		return srcAddress;
 	}
 }

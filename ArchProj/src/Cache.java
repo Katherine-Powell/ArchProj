@@ -19,8 +19,11 @@ public class Cache {
 	private int overhead;
 	private int impMemorySize;
 	
-	private ArrayList<int[]> chache;
-	private int data[];
+	private ArrayList<int[][]> cache;
+	private int blockReplace[];
+	
+	private int numHits;
+	private int numMisses;
 	
 	public Cache(String[] args) {
 		//Given
@@ -38,22 +41,112 @@ public class Cache {
 		overhead = calcOverhead();
 		impMemorySize = calcImpMemorySize();
 		
-		chache = new ArrayList<int[]>();
+		cache = new ArrayList<int[][]>();
+		for(int i=0; i<associativityNum; i++)
+		{
+			cache.add(new int[numIndicies][4]);
+		}
 		
-		data = new int[cacheSize];
+		blockReplace = new int[numIndicies];
+		
 	}
 	
-	public int getIndexFromAddress(int address) {
+	public boolean isInCache(long address){
+		int addressIndex = getIndexFromAddress(address);
+		int tag = getTagFromAddress(address);
+		int block[][];
+		int row[];
+		
+		for(int i=0; i<associativityNum; i++) {
+			block = cache.get(i);
+			row = block[addressIndex];
+			if(row[0] == addressIndex && row[2] == tag){
+				numHits++;
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addRoundRobinEntry(long address, int length){
+	
+		
+		int addressIndex = getIndexFromAddress(address);
+		int tag = getTagFromAddress(address);
+		int offset = getOffsetFromAddress(address);
+		
+		//System.out.printf("0x%08x 0x%08x 0x%08x\n",tag, addressIndex, offset);
+		
+		if(address == 0)
+			return;
+		
+		if(!isInCache(address)){
+			int block[][] = cache.get(blockReplace[addressIndex]);
+			if(block[addressIndex][1] != 1)
+				numMisses++;
+			//System.out.printf("1 miss at 0x%08x\n", addressIndex);
+			
+			block[addressIndex][0] = addressIndex;
+			block[addressIndex][1] = 1;
+			block[addressIndex][2] = tag;
+			// if data column was needed... put here
+			blockReplace[addressIndex] ++;
+			if(blockReplace[addressIndex] == associativityNum)
+				blockReplace[addressIndex] = 0;			
+		}
+		
+		int bitsLeftover = extraBits(offset, length); 
+		
+		if(bitsLeftover > 0) {
+			address += length;
+			addRoundRobinEntry(address, bitsLeftover);
+		}
+		/*
+		for(int i = 0; i < 4; i++) {
+			System.out.print(arr[index][i] + " ");
+		}*/
+		
+	}
+	
+	public int extraBits(int offset, int length) {
+		String binaryLimit = new String();
+		int limit;
+		for(int i =0; i<blockOffsetBits; i++){
+			binaryLimit += 1;
+		}
+		limit = Integer.parseUnsignedInt(binaryLimit, 2);
+		
+		return offset + length - limit;
+	}
+	
+	public double getCacheHitRatio(){
+		System.out.println(numHits);
+		System.out.println(numMisses);
+		return (double)numHits/(double)(numHits+numMisses) * 100;
+	}
+	
+	public int getOffsetFromAddress(long address) {
+		String andNumS = new String();
+		for(int i =0; i<blockOffsetBits; i++){
+			andNumS += 1;
+		}
+		int andNumInt = Integer.parseInt(andNumS, 2);
+		return (int)(address & andNumInt);
+	}
+	
+	public int getIndexFromAddress(long address) {
+		address = address >> blockOffsetBits;
+		
 		String andNumS = new String();
 		for(int i =0; i<indexBits; i++){
 			andNumS += 1;
 		}
 		int andNumInt = Integer.parseInt(andNumS, 2);
-		return address & andNumInt;
+		return (int)(address & andNumInt);
 	}
 	
-	public int getTagFromAddress(int address){
-		return address >> indexBits;
+	public int getTagFromAddress(long address){
+		return (int)(address >> (indexBits + blockOffsetBits));
 	}
 	
 	public String getAssocName() {
@@ -135,14 +228,6 @@ public class Cache {
 
 	public int getBlockOffset() {
 		return blockOffsetBits;
-	}
-
-	public int[] getData() {
-		return data;
-	}
-
-	public void setData(int[] data) {
-		this.data = data;
 	}
 
 	public void setBlockOffset(int blockOffset) {
