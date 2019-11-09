@@ -59,6 +59,10 @@ public class ProjectDriver {
 			}
 		}
 		
+		cache.setIndexBits(3);
+		int num = Integer.parseInt("C8", 16);
+		System.out.println(cache.getIndexFromAddress(num));
+		System.out.println(cache.getTagFromAddress(num));
 	}
 	
 	public static int parseAddressOne (String line) {

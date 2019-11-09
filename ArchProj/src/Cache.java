@@ -43,6 +43,19 @@ public class Cache {
 		data = new int[cacheSize];
 	}
 	
+	public int getIndexFromAddress(int address) {
+		String andNumS = new String();
+		for(int i =0; i<indexBits; i++){
+			andNumS += 1;
+		}
+		int andNumInt = Integer.parseInt(andNumS, 2);
+		return address & andNumInt;
+	}
+	
+	public int getTagFromAddress(int address){
+		return address >> indexBits;
+	}
+	
 	public String getAssocName() {
 		if(associativityNum == 1)
 			return "direct";
@@ -50,7 +63,7 @@ public class Cache {
 			return associativityNum + "-way";
 	}
 	
-	//Calculations
+	//Cache Info Calculations
 	private int calcNumBlocks() {
 		return cacheSize / blockSize;
 	}
@@ -78,7 +91,6 @@ public class Cache {
 	private int calcImpMemorySize() {
 		return overhead + cacheSize;
 	}
-
 	
 	//Getters and Setters
 	public int getCacheSize() {
