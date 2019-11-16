@@ -1,0 +1,23 @@
+Cache Simulator CS 3853 Fall 2019 - Group #4
+
+Cmd Line: Sim.exe -f TinyTrace.trc -s 1024 -b 16 -a 2 -r RR 
+Trace File: TinyTrace.trc
+Cache Size: 1024 KB
+Block Size: 16 bytes
+Associativity: 2-way
+R-Policy: RR
+
+Generic: 
+Cache Size: 1024 KB
+Block Size: 16 bytes
+Associativity: 2
+Policy: RR
+----- Calculated Values -----
+Total #Blocks: 64 KB (2^ 16)
+Tag Size: 13 bits
+Index Size: 15 bits, Total Indices: 32 KB
+Overhead Memory Size: 114688 bytes (or 112 KB)
+Implementation Memory Size: 1163264 bytes (or 1136 KB)
+----- Results -----
+Cache Hit Rate: 66.7%
+CPI:  7.3 cycles/instruction

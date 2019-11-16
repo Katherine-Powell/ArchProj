@@ -12,7 +12,7 @@ public class ProjectDriver {
 		File inputFile = new File (traceFileName);
 		Scanner scan = new Scanner(inputFile);
 			
-		PrintStream outputFile = new PrintStream(new File("Trace5.trc"));
+		PrintStream outputFile = new PrintStream(new File("TraceRND.trc"));
 				
 		// Initialize Command Line Arguments
 		Cache cache = new Cache(args);
@@ -45,25 +45,53 @@ public class ProjectDriver {
 		System.out.println("Overhead Memory Size: " + cache.getOverhead() + " bytes (or " + Util.convertToKB(cache.getOverhead()) + " KB)");
 		System.out.println("Implementation Memory Size: " + cache.getImpMemorySize() + " bytes (or " + Util.convertToKB(cache.getImpMemorySize()) + " KB)");
 		
-		System.out.println("----- Results -----");
-		System.out.println("Cache Hit Rate: ***%");
-		System.out.println("CPI: \n");		
-		
-		//TODO: random replace, and CPI calculation
-		
 		while(scan.hasNextLine()) {
 			String line = scan.nextLine();
 			if((line.contains("EIP")) || (line.contains("dstM"))) {
 				int length = parseLength(line);
-				cache.addRoundRobinEntry(parseAddressOne(line), length);
-				line = scan.nextLine();
-				cache.addRoundRobinEntry(parseAddressTwo(line) , 4);
-				cache.addRoundRobinEntry(parseAddressThree(line), 4);
+				if(cache.getRPolicy().equals("RR")) { //round robin
+					cache.addRoundRobinEntry(parseAddressOne(line), length);
+					line = scan.nextLine();
+					
+					//Add 2 clockCycles for data accesses 
+					long address2 = parseAddressTwo(line);
+					long address3 = parseAddressThree(line);
+					if(address2 != 0 || address3 != 0)
+						cache.setClockCycles(cache.getClockCycles() + 2);
+					
+					cache.addRoundRobinEntry(address2 , 4);
+					cache.addRoundRobinEntry(address3 , 4);
+					
+					cache.setInstructionCount(cache.getInstructionCount()+1);
+					
+					//add 2 clock cycles for every instruction
+					cache.setClockCycles(cache.getClockCycles() + 2);
+				}
+				else if(cache.getRPolicy().equals("RND")) { //random replace
+					cache.addRandomEntry(parseAddressOne(line), length);
+					line = scan.nextLine();
+					cache.addRandomEntry(parseAddressTwo(line) , 4);
+					cache.addRandomEntry(parseAddressThree(line), 4);
+					
+					//Add 2 clockCycles for data accesses 
+					long address2 = parseAddressTwo(line);
+					long address3 = parseAddressThree(line);
+					if(address2 != 0 || address3 != 0)
+						cache.setClockCycles(cache.getClockCycles() + 2);
+					
+					cache.setInstructionCount(cache.getInstructionCount()+1);
+					
+					//add 2 clock cycles for every instruction
+					cache.setClockCycles(cache.getClockCycles() + 2);
+				}
 			}
 		}
 		
 		
-		System.out.println(cache.getCacheHitRatio());
+		System.out.println("----- Results -----");
+		System.out.printf("Cache Hit Rate: %.1f%%\n",cache.getCacheHitRatio());
+		System.out.printf("CPI:  %.1f cycles/instruction", (double)cache.getClockCycles()/cache.getInstructionCount());	
+		
 	}
 	
 	public static int parseLength(String line) {
@@ -89,7 +117,6 @@ public class ProjectDriver {
 		
 		long address = Long.parseLong(grabAddress, 16);
 		return address;
-		//String.format("0x%08x: (%d)", address, Integer.parseInt(length));
 	}
 	
 	public static long parseAddressTwo (String line) {

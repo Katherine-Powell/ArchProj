@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Cache {
 	
@@ -24,7 +25,14 @@ public class Cache {
 	
 	private int numHits;
 	private int numMisses;
+	private int clockCycles;
 	
+	private Random generator;
+	
+	private int instructionCount;
+	
+	
+
 	public Cache(String[] args) {
 		//Given
 		cacheSize = Integer.parseInt(args[4]) * 1024; //convert to bytes
@@ -48,20 +56,20 @@ public class Cache {
 		}
 		
 		blockReplace = new int[numIndicies];
-		
+		generator = new Random(System.currentTimeMillis());
+		instructionCount = 0;
+		clockCycles = 0;
 	}
 	
 	public boolean isInCache(long address){
 		int addressIndex = getIndexFromAddress(address);
 		int tag = getTagFromAddress(address);
 		int block[][];
-		int row[];
-		
+	
 		for(int i=0; i<associativityNum; i++) {
 			block = cache.get(i);
-			row = block[addressIndex];
-			if(row[0] == addressIndex && row[2] == tag){
-				numHits++;
+			if(block[addressIndex][0] == addressIndex && block[addressIndex][2] == tag){
+				clockCycles++;
 				return true;
 			}
 		}
@@ -69,22 +77,21 @@ public class Cache {
 	}
 	
 	public void addRoundRobinEntry(long address, int length){
+		double numReads = blockSize/4.0;
 	
-		
 		int addressIndex = getIndexFromAddress(address);
 		int tag = getTagFromAddress(address);
 		int offset = getOffsetFromAddress(address);
-		
-		//System.out.printf("0x%08x 0x%08x 0x%08x\n",tag, addressIndex, offset);
 		
 		if(address == 0)
 			return;
 		
 		if(!isInCache(address)){
 			int block[][] = cache.get(blockReplace[addressIndex]);
-			if(block[addressIndex][1] != 1)
+			if(block[addressIndex][1] != 1){
 				numMisses++;
-			//System.out.printf("1 miss at 0x%08x\n", addressIndex);
+				clockCycles += 3 * numReads;
+			}
 			
 			block[addressIndex][0] = addressIndex;
 			block[addressIndex][1] = 1;
@@ -94,6 +101,10 @@ public class Cache {
 			if(blockReplace[addressIndex] == associativityNum)
 				blockReplace[addressIndex] = 0;			
 		}
+		else { // cache hit
+			numHits++;
+			clockCycles++;
+		}
 		
 		int bitsLeftover = extraBits(offset, length); 
 		
@@ -101,11 +112,42 @@ public class Cache {
 			address += length;
 			addRoundRobinEntry(address, bitsLeftover);
 		}
-		/*
-		for(int i = 0; i < 4; i++) {
-			System.out.print(arr[index][i] + " ");
-		}*/
 		
+	}
+	
+	public void addRandomEntry(long address, int length){
+		double numReads = blockSize/4.0;
+		
+		int addressIndex = getIndexFromAddress(address);
+		int tag = getTagFromAddress(address);
+		int offset = getOffsetFromAddress(address);
+		
+		if(address == 0)
+			return;
+		
+		if(!isInCache(address)){
+			int block[][] = cache.get(generator.nextInt(associativityNum));
+			if(block[addressIndex][1] != 1) {
+				numMisses++;
+				clockCycles += 3 * numReads;
+			}
+					
+			block[addressIndex][0] = addressIndex;
+			block[addressIndex][1] = 1;
+			block[addressIndex][2] = tag;
+			// if data column was needed... put here	
+		}
+		else {
+			numHits++;
+			clockCycles++;
+		}
+		
+		int bitsLeftover = extraBits(offset, length); 
+		
+		if(bitsLeftover > 0) {
+			address += length;
+			addRandomEntry(address, bitsLeftover);
+		}
 	}
 	
 	public int extraBits(int offset, int length) {
@@ -120,8 +162,6 @@ public class Cache {
 	}
 	
 	public double getCacheHitRatio(){
-		System.out.println(numHits);
-		System.out.println(numMisses);
 		return (double)numHits/(double)(numHits+numMisses) * 100;
 	}
 	
@@ -186,6 +226,14 @@ public class Cache {
 	}
 	
 	//Getters and Setters
+	
+	public int getInstructionCount() {
+		return instructionCount;
+	}
+
+	public void setInstructionCount(int instructionCount) {
+		this.instructionCount = instructionCount;
+	}
 	public int getCacheSize() {
 		return cacheSize;
 	}
@@ -280,6 +328,14 @@ public class Cache {
 
 	public void setImpMemorySize(int impMemorySize) {
 		this.impMemorySize = impMemorySize;
+	}
+
+	public int getClockCycles() {
+		return clockCycles;
+	}
+
+	public void setClockCycles(int clockCycles) {
+		this.clockCycles = clockCycles;
 	}
 
 	
