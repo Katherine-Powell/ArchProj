@@ -12,7 +12,7 @@ public class ProjectDriver {
 		File inputFile = new File (traceFileName);
 		Scanner scan = new Scanner(inputFile);
 			
-		PrintStream outputFile = new PrintStream(new File("TraceRND.trc"));
+		PrintStream outputFile = new PrintStream(new File("Trace5.trc"));
 				
 		// Initialize Command Line Arguments
 		Cache cache = new Cache(args);
@@ -90,7 +90,11 @@ public class ProjectDriver {
 		
 		System.out.println("----- Results -----");
 		System.out.printf("Cache Hit Rate: %.1f%%\n",cache.getCacheHitRatio());
-		System.out.printf("CPI:  %.1f cycles/instruction", (double)cache.getClockCycles()/cache.getInstructionCount());	
+		System.out.printf("Cache Miss Rate: %.1f%%\n", 100-cache.getCacheHitRatio());
+		System.out.printf("CPI:  %.1f cycles/instruction\n", (double)cache.getClockCycles()/cache.getInstructionCount());	
+		
+		System.out.println("Hits: " + cache.getNumHits());
+		System.out.println("Misses: " + cache.getNumMisses());
 		
 	}
 	

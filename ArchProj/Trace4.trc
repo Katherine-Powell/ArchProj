@@ -1,27 +1,26 @@
 Cache Simulator CS 3853 Fall 2019 - Group #4
 
-Cmd Line: Sim.exe -f A-9_new 1.5.pdf.trc -s 1024 -b 16 -a 2 -r RR 
+Cmd Line: Sim.exe –f A-9_new 1.5.pdf.trc –s 64 –b 4 –a 2 –r RND 
 Trace File: A-9_new 1.5.pdf.trc
-Cache Size: 1024 KB
-Block Size: 16 bytes
+Cache Size: 64 KB
+Block Size: 4 bytes
 Associativity: 2-way
-R-Policy: RR
+R-Policy: RND
 
 Generic: 
-Cache Size: 1024 KB
-Block Size: 16 bytes
+Cache Size: 64 KB
+Block Size: 4 bytes
 Associativity: 2
-Policy: RR
+Policy: RND
 ----- Calculated Values -----
-Total #Blocks: 64 KB (2^ 16)
-Tag Size: 13 bits
-Index Size: 15 bits, Total Indices: 32 KB
-Overhead Memory Size: 114688 bytes (or 112 KB)
-Implementation Memory Size: 1163264 bytes (or 1136 KB)
+Total #Blocks: 16 KB (2^ 14)
+Tag Size: 17 bits
+Index Size: 13 bits, Total Indices: 8 KB
+Overhead Memory Size: 36864 bytes (or 36 KB)
+Implementation Memory Size: 102400 bytes (or 100 KB)
 ----- Results -----
-Cache Hit Rate: ***%
-CPI: 
-
-411219
-12770
-96.98812940901769
+Cache Hit Rate: 96.4%
+Cache Miss Rate: 3.6%
+CPI:  5.4 cycles/instruction
+Hits: 336824
+Misses: 12603

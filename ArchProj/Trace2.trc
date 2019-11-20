@@ -1,54 +1,26 @@
 Cache Simulator CS 3853 Fall 2019 - Group #4
 
-Cmd Line: Sim.exe -f Trace1A.trc -s 8 -b 4 -a 2 -r RR 
-Trace File: Trace1A.trc
-Cache Size: 8 KB
-Block Size: 4 bytes
+Cmd Line: Sim.exe –f A-9_new 1.5.pdf.trc –s 1024 –b 16 –a 2 –r RR 
+Trace File: A-9_new 1.5.pdf.trc
+Cache Size: 1024 KB
+Block Size: 16 bytes
 Associativity: 2-way
 R-Policy: RR
 
 Generic: 
-Cache Size: 8 KB
-Block Size: 4 bytes
+Cache Size: 1024 KB
+Block Size: 16 bytes
 Associativity: 2
 Policy: RR
 ----- Calculated Values -----
-Total #Blocks: 2 KB (2^ 11)
-Tag Size: 20 bits
-Index Size: 10 bits, Total Indices: 1 KB
-Overhead Memory Size: 5376 bytes (or 5 KB)
-Implementation Memory Size: 13568 bytes (or 13 KB)
+Total #Blocks: 64 KB (2^ 16)
+Tag Size: 13 bits
+Index Size: 15 bits, Total Indices: 32 KB
+Overhead Memory Size: 114688 bytes (or 112 KB)
+Implementation Memory Size: 1163264 bytes (or 1136 KB)
 ----- Results -----
-Cache Hit Rate: ***%
-CPI: 
-
-0x7c809755: (6) 
-0x00000000: (4)
-0x00000000: (4)
-0x7c80975b: (3) 
-0x00000000: (4)
-0x0012e548: (4)
-0x7c80975e: (3) 
-0x00000000: (4)
-0x00000000: (4)
-0x7c809761: (6) 
-0x00000000: (4)
-0x00000000: (4)
-0x7c809767: (4) 
-0x00000000: (4)
-0x00000000: (4)
-0x7c80976b: (7) 
-0x7ffdf034: (4)
-0x7ffdfe4c: (4)
-0x7c809772: (1) 
-0x00000000: (4)
-0x00000000: (4)
-0x7c809773: (3) 
-0x00000000: (4)
-0x00000000: (4)
-0x017638ac: (2) 
-0x00000000: (4)
-0x008b8e20: (4)
-0x017638ae: (1) 
-0x00000000: (4)
-0x00000000: (4)
+Cache Hit Rate: 96.2%
+Cache Miss Rate: 3.8%
+CPI:  5.9 cycles/instruction
+Hits: 344814
+Misses: 13685

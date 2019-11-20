@@ -24,6 +24,9 @@ public class Cache {
 	private int blockReplace[];
 	
 	private int numHits;
+	private int numCompulsoryMisses;
+	private int numConflictMisses;
+
 	private int numMisses;
 	private int clockCycles;
 	
@@ -31,8 +34,6 @@ public class Cache {
 	
 	private int instructionCount;
 	
-	
-
 	public Cache(String[] args) {
 		//Given
 		cacheSize = Integer.parseInt(args[4]) * 1024; //convert to bytes
@@ -59,6 +60,7 @@ public class Cache {
 		generator = new Random(System.currentTimeMillis());
 		instructionCount = 0;
 		clockCycles = 0;
+		
 	}
 	
 	public boolean isInCache(long address){
@@ -83,16 +85,24 @@ public class Cache {
 		int tag = getTagFromAddress(address);
 		int offset = getOffsetFromAddress(address);
 		
+		int currentBlockReplace = blockReplace[addressIndex];
+		
 		if(address == 0)
 			return;
 		
 		if(!isInCache(address)){
 			int block[][] = cache.get(blockReplace[addressIndex]);
+			
 			if(block[addressIndex][1] != 1){
 				numMisses++;
+				numCompulsoryMisses++;
 				clockCycles += 3 * numReads;
 			}
-			
+			else {
+				numMisses++;
+				numConflictMisses++;
+			}
+				
 			block[addressIndex][0] = addressIndex;
 			block[addressIndex][1] = 1;
 			block[addressIndex][2] = tag;
@@ -109,9 +119,36 @@ public class Cache {
 		int bitsLeftover = extraBits(offset, length); 
 		
 		if(bitsLeftover > 0) {
-			address += length;
-			addRoundRobinEntry(address, bitsLeftover);
+			manualReplace(address, bitsLeftover, currentBlockReplace); // Call if data takes up more than one row
 		}
+		
+	}
+
+	public void manualReplace(long address, int length, int blockReplace){
+		double numReads = blockSize/4.0;
+	
+		int addressIndex = getIndexFromAddress(address);
+		addressIndex += 1;
+		if(addressIndex >= numIndicies)
+			addressIndex = 0;
+		int tag = getTagFromAddress(address);
+		int offset = getOffsetFromAddress(address);
+		
+		if(address == 0)
+			return;
+		
+		int block[][] = cache.get(blockReplace);
+		if(block[addressIndex][1] != 1){
+			numMisses++;
+			numCompulsoryMisses++;
+			clockCycles += 3 * numReads;
+		}
+
+		
+		block[addressIndex][0] = addressIndex;
+		block[addressIndex][1] = 1;
+		block[addressIndex][2] = tag;
+		// if data column was needed... put here
 		
 	}
 	
@@ -121,6 +158,8 @@ public class Cache {
 		int addressIndex = getIndexFromAddress(address);
 		int tag = getTagFromAddress(address);
 		int offset = getOffsetFromAddress(address);
+		
+		int currentBlockReplace = blockReplace[addressIndex];
 		
 		if(address == 0)
 			return;
@@ -145,20 +184,19 @@ public class Cache {
 		int bitsLeftover = extraBits(offset, length); 
 		
 		if(bitsLeftover > 0) {
-			address += length;
-			addRandomEntry(address, bitsLeftover);
+			manualReplace(address, bitsLeftover, currentBlockReplace); // Call if data takes up more than one row
 		}
 	}
 	
 	public int extraBits(int offset, int length) {
-		String binaryLimit = new String();
+		String binaryLimit = new String(); // string representation of binary number
 		int limit;
 		for(int i =0; i<blockOffsetBits; i++){
-			binaryLimit += 1;
+			binaryLimit += 1; // put ones in actual string
 		}
-		limit = Integer.parseUnsignedInt(binaryLimit, 2);
+		limit = Integer.parseUnsignedInt(binaryLimit, 2); // convert binary number to decimal
 		
-		return offset + length - limit;
+		return (offset + length) - limit;
 	}
 	
 	public double getCacheHitRatio(){
@@ -337,8 +375,36 @@ public class Cache {
 	public void setClockCycles(int clockCycles) {
 		this.clockCycles = clockCycles;
 	}
+	public int getNumCompulsoryMisses() {
+		return numCompulsoryMisses;
+	}
 
+	public void setNumCompulsoryMisses(int numCompulsoryMisses) {
+		this.numCompulsoryMisses = numCompulsoryMisses;
+	}
+
+	public int getNumConflictMisses() {
+		return numConflictMisses;
+	}
+
+	public void setNumConflictMisses(int numConflictMisses) {
+		this.numConflictMisses = numConflictMisses;
+	}
 	
-	
-	
+	public int getNumHits() {
+		return numHits;
+	}
+
+	public void setNumHits(int numHits) {
+		this.numHits = numHits;
+	}
+
+	public int getNumMisses() {
+		return numMisses;
+	}
+
+	public void setNumMisses(int numMisses) {
+		this.numMisses = numMisses;
+	}
+
 }
